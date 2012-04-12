@@ -4,14 +4,14 @@ Depth - DisCODe Component Library
 Description
 -----------
 
-Fill this section with description of this library.
+Components for processing depth information from cameras like Kinect.
 
 Dependencies
 ------------
 
-Put here any dependencies of this library (other DCLs, third party libraries etc)
+OpenCV
 
 Maintainer
 ----------
 
-Provide any information about yourself
+Maciej Stefańczyk
