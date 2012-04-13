@@ -78,28 +78,79 @@ void cross(float a1, float a2, float a3, float b1, float b2, float b3, float & c
 	c3 *= nf;
 }
 
+float calculateDist(cv::Point3f a, cv::Point3f b) {
+	return norm(a-b);
+}
+
+cv::Point3f calculateCross(cv::Point3f a, cv::Point3f b) {
+	cv::Point3f c;
+	c.x = a.y*b.z - a.z*b.y;
+	c.y = a.z*b.x - a.x*b.z;
+	c.z = a.x*b.y - a.y*b.x;
+	return c * (1./norm(c));
+}
+
+cv::Point3f calculateNormal(cv::Mat img, cv::Mat der_row, cv::Mat der_col, int row, int col, float dist, int window) {
+	cv::Point3f ret;
+	cv::Point3f curpoint = img.at<cv::Point3f>(row, col);
+	cv::Point3f drow(0, 0, 0), dcol(0, 0, 0);
+	cv::Point3f pt;
+	float sum=0;
+
+	for (int i = -window; i <= window; ++i) {
+		for (int j = -window; j <= window; ++j) {
+			pt = img.at<cv::Point3f>(row+i, col+j);
+			float d = calculateDist(curpoint, pt);
+			if (d <= dist) {
+				float sc = 1.0 - d/dist;
+				drow += der_row.at<cv::Point3f>(row+i, col+j) * sc;
+				dcol += der_col.at<cv::Point3f>(row+i, col+j) * sc;
+				sum += sc;
+			}
+		}
+	}
+//	drow *= (1./sum);
+//	dcol *= (1./sum);
+
+	ret = calculateCross(drow, dcol);
+	if (row == 240 && col == 320)
+		std::cout << ret.x << ", " << ret.y << ", " << ret.z << " | " << norm(ret) << "\n";
+	return ret;
+}
+
 void NormalEstimator::onNewImage() {
 	try {
 		img = in_img.read();
 		cv::Size size = img.size();
 		out.create(size, CV_8UC3);
+		cv::Mat der_row;
+		cv::Mat der_col;
+		der_row.create(size, CV_32FC3);
+		der_col.create(size, CV_32FC3);
 
-		//std::cout << size.width << "x" << size.height << "x" << img.channels() << "x" << img.elemSize() << "bpp\n";
+		for (int i = 0; i < size.height-1; i++) {
+			cv::Point3f* img_p = img.ptr <cv::Point3f> (i);
+			cv::Point3f* img_np =  img.ptr <cv::Point3f> (i+1);
+			cv::Point3f* p_row = der_row.ptr<cv::Point3f>(i);
+			cv::Point3f* p_col = der_col.ptr<cv::Point3f>(i);
+			for (int j = 0; j < size.width-1; ++j) {
+				p_row[j] = img_p[j+1] - img_p[j];
+				p_col[j] = img_np[j] - img_p[j];
+			}
+		}
 
-		// Check the arrays for continuity and, if this is the case,
-		// treat the arrays as 1D vectors
-		//if (img.isContinuous()) {
-		//	size.width *= size.height;
-		//	size.height = 1;
-		//}
+		int window = 5;
+		for (int i = window; i < size.height-window-1; i++) {
+			uchar * out_p = out.ptr<uchar>(i);
+			for (int j = window; j < size.width-window-1; ++j) {
+				cv::Point3f normal = calculateNormal(img, der_row, der_col, i, j, 0.02, window);
+				out_p[3*j+2] = normal.x * 255;
+				out_p[3*j+1] = normal.y * 255;
+				out_p[3*j+0] = normal.z * 255;
+			}
+		}
 
-		//double mmin, mmax;
-		//cv::minMaxLoc(img, &mmin, &mmax);
-		//std::cout << mmax << "\n";
-
-		//cv::GaussianBlur(img, img, cv::Size(5, 5), 0);
-
-		for (int i = 1; i < size.height-1; i++) {
+		/*for (int i = 1; i < size.height-1; i++) {
 			float* img_pp = img.ptr <float> (i-1);
 			float* img_p =  img.ptr <float> (i);
 			float* img_np = img.ptr <float> (i+1);
@@ -142,75 +193,17 @@ void NormalEstimator::onNewImage() {
 
 				z = img_p[3*j+2];
 				if (z != 0) {
-					//out_p[3*j+2] = rx * 255;
-					//out_p[3*j+1] = ry * 255;
-					//out_p[3*j+0] = rz * 255;
-					out_p[3*j+0] = (z-0.5) * 512;
+					out_p[3*j+2] = rx * 255;
+					out_p[3*j+1] = ry * 255;
+					out_p[3*j+0] = rz * 255;
+					//out_p[3*j+0] = (z-0.5) * 512;
 				} else {
 					out_p[3*j+2] = 0;
 					out_p[3*j+1] = 0;
 					out_p[3*j+0] = 0;
 				}
-
-
-				/*if (z != 0) {
-					out_p[3*j+2] = (img_p[3*j+0]+1)*128;
-					out_p[3*j+1] = (img_p[3*j+1]+1)*128;
-					out_p[3*j+0] = img_p[3*j+2] * 100;
-				} else {
-				}*/
-
-				if (j == (640*240 + 320))
-					std::cout << x << ", " << y << ", " << z << "\n";
-				/*int val = img_p[j];
-				val = (val >> 8) | ( (val & 0xff) << 8);
-				//int pval = m_gamma[val]/4;
-				int pval = val;
-				int lb = pval & 0xff;
-				//out_p[3*j] = img_p[j] >> 8;
-				if (j == (640*240 + 320))
-					std::cout << val << ", " << m_gamma[val]/4 << "\n";
-				switch (pval>>8) {
-				case 0:
-					out_p[3*j+0] = 255;
-					out_p[3*j+1] = 255-lb;
-					out_p[3*j+2] = 255-lb;
-					break;
-				case 1:
-					out_p[3*j+0] = 255;
-					out_p[3*j+1] = lb;
-					out_p[3*j+2] = 0;
-					break;
-				case 2:
-					out_p[3*j+0] = 255-lb;
-					out_p[3*j+1] = 255;
-					out_p[3*j+2] = 0;
-					break;
-				case 3:
-					out_p[3*j+0] = 0;
-					out_p[3*j+1] = 255;
-					out_p[3*j+2] = lb;
-					break;
-				case 4:
-					out_p[3*j+0] = 0;
-					out_p[3*j+1] = 255-lb;
-					out_p[3*j+2] = 255;
-					break;
-				case 5:
-					out_p[3*j+0] = 0;
-					out_p[3*j+1] = 0;
-					out_p[3*j+2] = 255-lb;
-					break;
-				default:
-					out_p[3*j+0] = 0;
-					out_p[3*j+1] = 0;
-					out_p[3*j+2] = 0;
-					break;
-				}*/
 			}
-		}
-
-		cv::medianBlur(out, out, 5);
+		}*/
 
 		out_img.write(out.clone());
 		newImage->raise();
