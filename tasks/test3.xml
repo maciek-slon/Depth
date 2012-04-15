@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+        <!-- List of components -->
+        <Components>                
+			<Generator type="DepthMapGenerator" thread="Exec1" group="s1">
+			</Generator>
+
+			<Dep1 type="NormalEstimator" thread="Exec1" group="s1">
+			</Dep1>
+
+			<Segments type="Segmentation" thread="Exec1" group="s1">
+			</Segments>
+
+                <Wnd1 type="CvWindow" thread="Exec3" group="s1">
+                        <title>Kinect Depth Viewer</title>
+                </Wnd1>
+                
+			
+        </Components>
+
+        <!-- Threads of execution -->
+        <Executors>
+                <Exec1 type="continuous">
+                        <main_component>Generator</main_component>
+                </Exec1>
+
+                <Exec3 type="periodic">
+                        <main_component>Wnd1</main_component>
+			<interval>0.1</interval>
+                </Exec3>
+        </Executors>
+
+        <!-- Event connections -->
+        <Events>
+                <Event source="Generator.newImage" destination="Dep1.onNewImage"/>
+                <Event source="Generator.newImage" destination="Segments.onNewDepth"/>
+                <Event source="Dep1.newNormals" destination="Segments.onNewNormals"/>
+                <Event source="Segments.newImage" destination="Wnd1.onNewImage"/>
+        </Events>
+
+        <!-- Data stream assignments -->
+        <DataStreams>
+			<Generator>
+				<out_img type="out" group="Con1"/>
+			</Generator>
+					
+			<Dep1>
+				<in_img type="in" group="Con1"/>
+				<out_normals type="out" group="Con2"/>
+			</Dep1>
+		
+			<Segments>
+				<in_normals type="in" group="Con2"/>
+				<in_depth type="in" group="Con1"/>
+				<out_img type="out" group="Con3"/>
+			</Segments>
+		
+			<Wnd1>
+				<in_img  type="in" group="Con3"/>
+			</Wnd1>
+        </DataStreams>
+
+</Task>

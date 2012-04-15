@@ -10,6 +10,9 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
+#include "Property.hpp"
+
+#include <string>
 
 #include <cv.h>
 
@@ -75,12 +78,18 @@ protected:
 	/// Output data stream - processed image
 	Base::DataStreamOut <cv::Mat> out_img;
 
+	/// Event raised, when image is processed
+	Base::Event * newNormals;
+
+	/// Output data stream - processed image
+	Base::DataStreamOut <cv::Mat> out_normals;
+
+	Base::Property<float> prop_radius;
 
 private:
 	cv::Mat img;
 	cv::Mat out;
-
-	std::vector<uint16_t> m_gamma;
+	cv::Mat normals;
 };
 
 }//: namespace NormalEstimator
