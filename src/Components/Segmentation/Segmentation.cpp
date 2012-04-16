@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <queue>
 
 #include "Segmentation.hpp"
 #include "Common/Logger.hpp"
@@ -49,23 +50,61 @@ bool Segmentation::onFinish() {
 	return true;
 }
 
+bool Segmentation::check(cv::Point point, cv::Point dir) {
+	cv::Point dest = point+dir;
+	if (m_closed.at<uchar>(dest) == 255)
+		return false;
+
+	m_closed.at<uchar>(dest) = 255;
+
+	if (!dest.inside(cv::Rect(0, 0, 639, 479)))
+		return false;
+
+	cv::Point3f curn = m_normals.at<cv::Point3f>(point);
+	cv::Point3f curd = m_depth.at<cv::Point3f>(point);
+	cv::Point3f desn = m_normals.at<cv::Point3f>(point+dir);
+	cv::Point3f desd = m_depth.at<cv::Point3f>(point+dir);
+
+	float angle = 180. / 3.14 * acos( curn.dot(desn) );
+	float dist = norm(desd-curd);
+	return (angle < 4 && dist < 0.02);
+}
+
 bool Segmentation::onStep() {
 	LOG(LTRACE) << "Segmentation::step\n";
-	m_clusters.create(cv::Size(640, 480), CV_8UC1);
+	m_clusters = cv::Mat::zeros(cv::Size(640, 480), CV_8UC1);
+	m_closed = cv::Mat::zeros(cv::Size(640, 480), CV_8UC1);
 
-	for (int r = 0; r < 480; ++r) {
+	std::queue<cv::Point> open;
+	open.push(cv::Point(320, 240));
+
+	cv::Point right(1, 0);
+	cv::Point left(-1, 0);
+	cv::Point up(0, -1);
+	cv::Point down(0, 1);
+
+	while (!open.empty()) {
+		cv::Point curpoint = open.front();
+		open.pop();
+		m_clusters.at<uchar>(curpoint) = 255;
+		if (check(curpoint, right))	open.push(curpoint+right);
+		if (check(curpoint, left))	open.push(curpoint+left);
+		if (check(curpoint, up))	open.push(curpoint+up);
+		if (check(curpoint, down))	open.push(curpoint+down);
+	}
+
+/*	for (int r = 0; r < 480; ++r) {
 		cv::Point3f * nptr = m_normals.ptr<cv::Point3f>(r);
+		cv::Point3f * dptr = m_depth.ptr<cv::Point3f>(r);
 		uchar * optr = m_clusters.ptr<uchar>(r);
 		for (int c = 0; c < 640-1; ++c) {
 			float val = 180. / 3.14 * acos( nptr[c].dot(nptr[c+1]) );
-			if (val < 1)
+			if ( (val < 3) && (norm(dptr[c]-dptr[c+1]) < 0.02) )
 				optr[c] = 255;
-			else if (val < 3)
-				optr[c] = 128;
 			else
 				optr[c] = 0;
 		}
-	}
+	}*/
 
 	out_img.write(m_clusters);
 	newImage->raise();

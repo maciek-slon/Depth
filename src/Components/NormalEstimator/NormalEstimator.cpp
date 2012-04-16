@@ -16,7 +16,7 @@ namespace Processors {
 namespace NormalEstimator {
 
 NormalEstimator::NormalEstimator(const std::string & name) : Base::Component(name),
-		prop_radius("radius", 0.01)
+		prop_radius("radius", 0.0075)
 {
 	LOG(LTRACE) << "Hello NormalEstimator\n";
 	registerProperty(prop_radius);
@@ -108,6 +108,7 @@ cv::Point3f calculateNormal(cv::Mat img, cv::Mat der_row, cv::Mat der_col, int r
 	cv::Point3f pt;
 	float sum=0;
 
+	dist *= dist;
 	for (int i = -window; i <= window; ++i) {
 		cv::Point3f * drow_ptr = der_row.ptr<cv::Point3f>(row+i);
 		cv::Point3f * dcol_ptr = der_col.ptr<cv::Point3f>(row+i);
@@ -116,12 +117,13 @@ cv::Point3f calculateNormal(cv::Mat img, cv::Mat der_row, cv::Mat der_col, int r
 			pt = img_ptr[col+j];
 			cv::Point3f tmp = curpoint-pt;
 			//float d = calculateDist(curpoint, pt);
-			float dd = InvSqrt(tmp.x*tmp.x+tmp.y*tmp.y+tmp.z*tmp.z);
-			float d = 1/dd;
+			//float dd = InvSqrt(tmp.x*tmp.x+tmp.y*tmp.y+tmp.z*tmp.z);
+			//float d = 1/dd;
+			float d = tmp.dot(tmp);
 			if (d <= dist) {
 				float sc = 1.0 - d/dist;
-				drow += drow_ptr[col+j]*sc;
-				dcol += dcol_ptr[col+j]*sc;
+				drow += drow_ptr[col+j] * sc;
+				dcol += dcol_ptr[col+j] * sc;
 				//sum += sc;
 			}
 		}
@@ -171,7 +173,7 @@ void NormalEstimator::onNewImage() {
 		}
 		t1 = timer.elapsed();
 
-		int window = 5;
+		int window = 6;
 		for (int i = window; i < size.height-window-1; i++) {
 			uchar * out_p = out.ptr<uchar>(i);
 			cv::Point3f * nptr = normals.ptr<cv::Point3f>(i);

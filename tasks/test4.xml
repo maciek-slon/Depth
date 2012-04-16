@@ -16,7 +16,8 @@
 			</Segments>
 
                 <Wnd1 type="CvWindow" thread="Exec3" group="s1">
-                        <title>Kinect Depth Viewer</title>
+                        <title>Depth</title>
+                        <count>2</count>
                 </Wnd1>
                 
 			
@@ -38,8 +39,9 @@
         <Events>
                 <Event source="Generator.newDepthMap" destination="Dep1.onNewImage"/>
                 <Event source="Generator.newDepthMap" destination="Segments.onNewDepth"/>
+                <Event source="Dep1.newImage" destination="Wnd1.onNewImage0"/>
                 <Event source="Dep1.newNormals" destination="Segments.onNewNormals"/>
-                <Event source="Segments.newImage" destination="Wnd1.onNewImage"/>
+                <Event source="Segments.newImage" destination="Wnd1.onNewImage1"/>
         </Events>
 
         <!-- Data stream assignments -->
@@ -51,6 +53,7 @@
 			<Dep1>
 				<in_img type="in" group="Con1"/>
 				<out_normals type="out" group="Con2"/>
+				<out_img type="out" group="NormalMap"/>
 			</Dep1>
 		
 			<Segments>
@@ -60,7 +63,8 @@
 			</Segments>
 		
 			<Wnd1>
-				<in_img  type="in" group="Con3"/>
+				<in_img0  type="in" group="NormalMap"/>
+				<in_img1  type="in" group="Con3"/>
 			</Wnd1>
         </DataStreams>
 

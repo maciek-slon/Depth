@@ -84,12 +84,13 @@ private:
 	void onNewDepth();
 	void onNewNormals();
 
-
+	bool check(cv::Point point, cv::Point dir);
 
 	cv::Mat m_normals;
 	cv::Mat m_depth;
 
 	cv::Mat m_clusters;
+	cv::Mat m_closed;
 
 	bool m_normals_ready;
 	bool m_depth_ready;

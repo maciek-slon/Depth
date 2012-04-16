@@ -3,42 +3,33 @@
  * \brief
  */
 
-#ifndef NORMALESTIMATOR_HPP_
-#define NORMALESTIMATOR_HPP_
+#ifndef DEPTHNORMALESTIMATOR_HPP_
+#define DEPTHNORMALESTIMATOR_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Property.hpp"
-
-#include <string>
-
-#include <cv.h>
 
 namespace Processors {
-namespace NormalEstimator {
-
-enum Algorithm {
-
-};
+namespace DepthNormalEstimator {
 
 /*!
- * \class NormalEstimator
- * \brief NormalEstimator processor class.
+ * \class DepthNormalEstimator
+ * \brief DepthNormalEstimator processor class.
  */
-class NormalEstimator: public Base::Component
+class DepthNormalEstimator: public Base::Component
 {
 public:
 	/*!
 	 * Constructor.
 	 */
-	NormalEstimator(const std::string & name = "");
+	DepthNormalEstimator(const std::string & name = "");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~NormalEstimator();
+	virtual ~DepthNormalEstimator();
 
 
 protected:
@@ -68,8 +59,6 @@ protected:
 	 */
 	bool onStop();
 
-	void onNewImage();
-
 	/// Event handler.
 	Base::EventHandler <NormalEstimator> h_onNewImage;
 
@@ -88,23 +77,19 @@ protected:
 	/// Output data stream - processed image
 	Base::DataStreamOut <cv::Mat> out_normals;
 
-	Base::Property<float> prop_radius;
-
 private:
 	cv::Mat img;
 	cv::Mat out;
 	cv::Mat normals;
-
-	Algorithm m_algorithm;
 };
 
-}//: namespace NormalEstimator
+}//: namespace DepthNormalEstimator
 }//: namespace Processors
 
 
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("NormalEstimator", Processors::NormalEstimator::NormalEstimator, Common::Panel_Empty)
+REGISTER_PROCESSOR_COMPONENT("DepthNormalEstimator", Processors::DepthNormalEstimator::DepthNormalEstimator, Common::Panel_Empty)
 
-#endif /* NORMALESTIMATOR_HPP_ */
+#endif /* DEPTHNORMALESTIMATOR_HPP_ */
