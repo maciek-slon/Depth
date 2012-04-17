@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 ADD_LIBRARY(DepthNormalEstimator SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(DepthNormalEstimator ${DisCODe_LIBRARIES} )
+# TARGET_LINK_LIBRARIES(DepthNormalEstimator ${DisCODe_LIBRARIES} )
 
 # Add aother libraries if necessary, for example:
-# TARGET_LINK_LIBRARIES(DepthNormalEstimator ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(DepthNormalEstimator ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
 
 INSTALL_COMPONENT(DepthNormalEstimator)

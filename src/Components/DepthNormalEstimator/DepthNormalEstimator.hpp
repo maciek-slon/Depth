@@ -11,6 +11,8 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 
+#include <cv.h>
+
 namespace Processors {
 namespace DepthNormalEstimator {
 
@@ -60,7 +62,7 @@ protected:
 	bool onStop();
 
 	/// Event handler.
-	Base::EventHandler <NormalEstimator> h_onNewImage;
+	Base::EventHandler <DepthNormalEstimator> h_onNewImage;
 
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
@@ -81,6 +83,8 @@ private:
 	cv::Mat img;
 	cv::Mat out;
 	cv::Mat normals;
+
+	void onNewImage();
 };
 
 }//: namespace DepthNormalEstimator

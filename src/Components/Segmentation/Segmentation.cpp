@@ -67,7 +67,7 @@ bool Segmentation::check(cv::Point point, cv::Point dir) {
 
 	float angle = 180. / 3.14 * acos( curn.dot(desn) );
 	float dist = norm(desd-curd);
-	return (angle < 4 && dist < 0.02);
+	return (angle < 2 && dist < 0.02);
 }
 
 bool Segmentation::onStep() {
