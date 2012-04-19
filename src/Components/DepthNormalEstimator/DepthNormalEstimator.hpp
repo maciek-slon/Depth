@@ -10,6 +10,7 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
+#include "Property.hpp"
 
 #include <cv.h>
 
@@ -83,6 +84,8 @@ private:
 	cv::Mat img;
 	cv::Mat out;
 	cv::Mat normals;
+
+	Base::Property<int> prop_difference_threshold;
 
 	void onNewImage();
 };

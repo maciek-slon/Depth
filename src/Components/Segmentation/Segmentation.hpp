@@ -10,6 +10,7 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
+#include "Property.hpp"
 
 #include <cv.h>
 
@@ -79,12 +80,17 @@ protected:
 	/// Output data stream - processed image
 	Base::DataStreamOut <cv::Mat> out_img;
 
+	Base::Property<float> prop_ang_diff;
+	Base::Property<float> prop_dist_diff;
+	Base::Property<float> prop_std_diff;
+
 private:
 
 	void onNewDepth();
 	void onNewNormals();
 
 	bool check(cv::Point point, cv::Point dir);
+	bool newSeed(cv::Point point, cv::Point dir);
 
 	cv::Mat m_normals;
 	cv::Mat m_depth;

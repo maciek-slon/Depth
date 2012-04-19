@@ -15,8 +15,11 @@ namespace Processors {
 namespace DepthNormalEstimator {
 
 DepthNormalEstimator::DepthNormalEstimator(const std::string & name) :
-		Base::Component(name) {
+		Base::Component(name),
+		prop_difference_threshold("difference_threshold", 20) {
 	LOG(LTRACE) << "Hello DepthNormalEstimator\n";
+
+	registerProperty(prop_difference_threshold);
 }
 
 DepthNormalEstimator::~DepthNormalEstimator() {
@@ -78,7 +81,7 @@ void DepthNormalEstimator::onNewImage() {
 	normals = cv::Mat::zeros(img.size(), CV_32FC3);
 
 	long distance_threshold = 2000;
-	int difference_threshold = 50;
+	int difference_threshold = prop_difference_threshold;
 
 	IplImage src_ipl = img;
 	IplImage* ap_depth_data = &src_ipl;
@@ -141,7 +144,11 @@ void DepthNormalEstimator::onNewImage() {
 
 					normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-l_nx, -l_ny, -l_nz);
 
+				} else {
+					normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-1, -1, -1);
 				}
+			} else {
+				normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-1, -1, -1);
 			}
 			++lp_line;
 		}
@@ -152,6 +159,9 @@ void DepthNormalEstimator::onNewImage() {
 
 	out_img.write(out.clone());
 	newImage->raise();
+
+	out_normals.write(normals.clone());
+	newNormals->raise();
 }
 
 } //: namespace DepthNormalEstimator
