@@ -52,10 +52,10 @@
 	<Events>
 		<Event source="Generator.newDepthMap" destination="Converter.onNewDepth"/>
 		<Event source="Generator.newDepthMap" destination="Normal2.onNewImage"/>
-		<Event source="Generator.newDepthMap" destination="Segments1.onNewDepth"/>
-		<Event source="Generator.newDepthMap" destination="Segments2.onNewDepth"/>
 		
 		<Event source="Converter.newImage" destination="Normal1.onNewImage"/>
+		<Event source="Converter.newImage" destination="Segments1.onNewDepth"/>
+		<Event source="Converter.newImage" destination="Segments2.onNewDepth"/>
 		
 		<Event source="Normal1.newImage" destination="Wnd1.onNewImage0"/>
 		<Event source="Normal2.newImage" destination="Wnd1.onNewImage1"/>

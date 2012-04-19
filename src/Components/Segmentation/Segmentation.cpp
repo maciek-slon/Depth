@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <queue>
+#include <cstdlib>
 
 #include "Segmentation.hpp"
 #include "Common/Logger.hpp"
@@ -85,6 +86,7 @@ bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
 }
 
 bool Segmentation::onStep() {
+	m_depth_ready = m_normals_ready = false;
 	typedef cv::Point3_<uchar> CvColor;
 	LOG(LTRACE) << "Segmentation::step\n";
 	m_clusters = cv::Mat::zeros(cv::Size(640, 480), CV_8UC3);
