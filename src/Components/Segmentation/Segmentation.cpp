@@ -86,6 +86,7 @@ bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
 }
 
 bool Segmentation::onStep() {
+	pcl::PointCloud<pcl::PointXYZ> cloud;
 	m_depth_ready = m_normals_ready = false;
 	typedef cv::Point3_<uchar> CvColor;
 	LOG(LTRACE) << "Segmentation::step\n";
@@ -123,6 +124,7 @@ bool Segmentation::onStep() {
 		float acc = 0;
 		float acc2 = 0;
 		float angle;
+		std::vector<int> inliers;
 		while (!open.empty()) {
 			cv::Point curpoint = open.front();
 			open.pop();
@@ -133,7 +135,10 @@ bool Segmentation::onStep() {
 			acc += angle;
 			acc2 += angle*angle;
 
-			point_mean += m_depth.at<cv::Point3f>(curpoint);
+			cv::Point3f p = m_depth.at<cv::Point3f>(curpoint);
+			point_mean += p;
+
+			cloud.push_back(pcl::PointXYZ(p.x, p.y, p.z));
 
 			m_clusters.at<CvColor>(curpoint) = id;
 			size++;
