@@ -86,7 +86,7 @@ bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
 }
 
 bool Segmentation::onStep() {
-	pcl::PointCloud<pcl::PointXYZ> cloud;
+	//pcl::PointCloud<pcl::PointXYZ> cloud;
 	m_depth_ready = m_normals_ready = false;
 	typedef cv::Point3_<uchar> CvColor;
 	LOG(LTRACE) << "Segmentation::step\n";
@@ -107,6 +107,9 @@ bool Segmentation::onStep() {
 	cv::Point up(0, -1);
 	cv::Point down(0, 1);
 
+
+	std::queue<cv::Point3f> blob_normals;
+	std::queue<cv::Point3f> blob_points;
 	while (!seed.empty()) {
 		open = std::queue<cv::Point>();
 
@@ -124,21 +127,26 @@ bool Segmentation::onStep() {
 		float acc = 0;
 		float acc2 = 0;
 		float angle;
-		std::vector<int> inliers;
+		//std::vector<int> inliers;
+
+		// growing segment
 		while (!open.empty()) {
 			cv::Point curpoint = open.front();
 			open.pop();
 			if (m_clusters.at<CvColor>(curpoint) != empty)
 				continue;
 
-			angle = 180. / 3.14 * acos( m_normals.at<cv::Point3f>(curpoint).dot(cv::Point3f(0, 0, 1)) );
-			acc += angle;
-			acc2 += angle*angle;
+			//angle = 180. / 3.14 * acos( m_normals.at<cv::Point3f>(curpoint).dot(cv::Point3f(0, 0, 1)) );
+			//acc += angle;
+			//acc2 += angle*angle;
 
 			cv::Point3f p = m_depth.at<cv::Point3f>(curpoint);
 			point_mean += p;
 
-			cloud.push_back(pcl::PointXYZ(p.x, p.y, p.z));
+			blob_normals.push(m_normals.at<cv::Point3f>(curpoint));
+			blob_points.push(p);
+
+			//cloud.push_back(pcl::PointXYZ(p.x, p.y, p.z));
 
 			m_clusters.at<CvColor>(curpoint) = id;
 			size++;
@@ -148,8 +156,38 @@ bool Segmentation::onStep() {
 			if (check(curpoint, down))	open.push(curpoint+down);
 		}
 
+		// calculating features for segment
 		point_mean *= 1.0f/size;
-		cv::Mat points(1, 1, CV_32FC3);
+
+		acc = acc2 = 0;
+		while (!blob_normals.empty()) {
+			// normalized vector from point to center of mass
+			cv::Point3f ntc = point_mean - blob_points.front();
+			ntc *= 1.0f / norm(ntc);
+			// normal in current point
+			cv::Point3f nor = blob_normals.front();
+			// angle between both vectors
+			angle = 180. / 3.14 * acos( nor.dot(ntc) );
+			acc += angle;
+			acc2 += angle*angle;
+			blob_normals.pop();
+			blob_points.pop();
+		}
+
+		// calculate mean angle and it's deviation
+		float mean = acc / size;
+		float std_dev = sqrt(((size * acc2) - (acc * acc)) / (size * (size - 1)));
+
+		if (std_dev > 20)
+			cv::floodFill(m_clusters, pt, cv::Scalar(mean, mean, mean));
+		else if (mean < 70)
+			cv::floodFill(m_clusters, pt, cv::Scalar(mean*1.5, 0, 0));
+		else if (mean < 100)
+			cv::floodFill(m_clusters, pt, cv::Scalar(0, mean*1.5, 0));
+		else
+			cv::floodFill(m_clusters, pt, cv::Scalar(0, 0, mean*1.5));
+
+		/*cv::Mat points(1, 1, CV_32FC3);
 		points.at<cv::Point3f>(0, 0) = point_mean;
 		std::vector<cv::Point2f> proj_points;
 		cv::Mat rot = cv::Mat::zeros(1, 3, CV_32FC1);
@@ -184,7 +222,7 @@ bool Segmentation::onStep() {
 			cv::floodFill(m_clusters, pt, cv::Scalar(0, 255, 0));
 		} else if (norm(accum) > norm(point_mean)) {
 			cv::floodFill(m_clusters, pt, cv::Scalar(0, 0, 255));
-		}
+		}*/
 	}
 
 	cv::medianBlur(m_clusters, m_clusters, 5);
