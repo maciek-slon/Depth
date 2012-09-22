@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>                
+		<Generator type="CameraNUI" thread="Exec1" group="s1">
+			<lib>freenect</lib>
+			<skip_stop>1</skip_stop>
+			<camera_mode>color</camera_mode>
+		</Generator>
+	
+		<Converter type="DepthConverter" thread="Exec1" group="s1">
+			<depth_mode>point_cloud</depth_mode>
+		</Converter>
+		
+		<Normal2 type="DepthNormalEstimator" thread="Exec1" group="s1">
+		</Normal2>
+		
+		<Segments2 type="Segmentation" thread="Exec1" group="s1">
+			<ang_diff>4.0</ang_diff>
+			<dist_diff>0.4</dist_diff>
+			<color_diff>0.1</color_diff>
+			<threshold>1</threshold>
+			<std_diff>6</std_diff>
+		</Segments2>
+	
+		<Wnd1 type="CvWindow" thread="Exec3" group="s1">
+			<title>Depth</title>
+			<count>3</count>
+		</Wnd1>
+	</Components>
+	
+	<!-- Threads of execution -->
+	<Executors>
+		<Exec1 type="periodic">
+			<main_component>Generator</main_component>
+			<interval>0.5</interval>
+		</Exec1>
+	
+		<Exec3 type="periodic">
+			<main_component>Wnd1</main_component>
+			<interval>0.1</interval>
+		</Exec3>
+	</Executors>
+	
+	<!-- Event connections -->
+	<Events>
+		<Event source="Generator.newDepthMap" destination="Converter.onNewDepth"/>
+		<Event source="Generator.newDepthMap" destination="Normal2.onNewImage"/>
+		<Event source="Generator.newImage" destination="Wnd1.onNewImage2"/>
+		
+		<Event source="Generator.newImage" destination="Segments2.onNewColor"/>
+
+		<Event source="Converter.newImage" destination="Segments2.onNewDepth"/>
+
+		
+		<Event source="Normal2.newImage" destination="Wnd1.onNewImage0"/>
+		
+		<Event source="Normal2.newNormals" destination="Segments2.onNewNormals"/>
+		
+		<Event source="Segments2.newImage" destination="Wnd1.onNewImage1"/>
+	</Events>
+	
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Generator>
+			<out_depth_map type="out" group="RawDepth"/>
+			<out_img type="out" group="RGB"/>
+		</Generator>
+				
+		<Converter>
+			<in_depth type="in" group="RawDepth" />
+			<out_img type="out" group="PointCloud" />
+		</Converter>
+		
+		<Normal2>
+			<in_img type="in" group="RawDepth"/>
+			<out_normals type="out" group="Normal2"/>
+			<out_img type="out" group="NormalMap2"/>
+		</Normal2>
+		
+		<Segments2>
+			<in_normals type="in" group="Normal2" />
+			<in_depth type="in" group="PointCloud" />
+			<in_color type="in" group="RGB" />
+			<out_img type="out" group="Segments2" />
+		</Segments2>
+		
+		<Wnd1>
+			<in_img0  type="in" group="NormalMap2"/>
+			<in_img1  type="in" group="Segments2"/>
+			<in_img2  type="in" group="RGB"/>
+		</Wnd1>
+	</DataStreams>
+</Task>

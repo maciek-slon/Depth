@@ -14,7 +14,6 @@
 
 #include <cv.h>
 
-#include <pcl/point_types.h>
 
 namespace Processors {
 namespace Segmentation {

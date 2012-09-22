@@ -5,7 +5,7 @@
 		<Generator type="CameraNUI" thread="Exec1" group="s1">
 			<lib>freenect</lib>
 			<skip_stop>1</skip_stop>
-			<camera_mode>gray</camera_mode>
+			<camera_mode>color</camera_mode>
 		</Generator>
 	
 		<Segments1 type="Segmentation" thread="Exec1" group="s1">
@@ -14,6 +14,11 @@
 			<color_diff>10.0</color_diff>
 			<std_diff>8</std_diff>
 		</Segments1>
+		
+		<Wnd1 type="CvWindow" thread="Exec3" group="s1">
+			<title>Depth</title>
+			<count>2</count>
+		</Wnd1>
 	</Components>
 	
 	<!-- Threads of execution -->
@@ -21,6 +26,11 @@
 		<Exec1 type="continuous">
 			<main_component>Generator</main_component>
 		</Exec1>
+		
+		<Exec3 type="periodic">
+			<main_component>Wnd1</main_component>
+			<interval>0.1</interval>
+		</Exec3>
 	</Executors>
 	
 	<!-- Event connections -->
@@ -37,6 +47,12 @@
 				
 		<Segments1>
 			<in_color type="in" group="RGB" />
+			<out_segments type="out" group="segments" />
 		</Segments1>
+		
+		<Wnd1>
+			<in_img0  type="in" group="RGB"/>
+			<in_img1  type="in" group="Segments"/>
+		</Wnd1>
 	</DataStreams>
 </Task>
