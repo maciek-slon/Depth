@@ -34,6 +34,7 @@ public:
 	 */
 	virtual ~DepthNormalEstimator();
 
+	void prepareInterface();
 
 protected:
 

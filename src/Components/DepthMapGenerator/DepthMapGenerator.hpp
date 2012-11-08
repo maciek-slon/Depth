@@ -33,6 +33,7 @@ public:
 	 */
 	virtual ~DepthMapGenerator();
 
+	void prepareInterface();
 
 protected:
 

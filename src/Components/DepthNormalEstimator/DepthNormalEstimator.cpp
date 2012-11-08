@@ -26,9 +26,7 @@ DepthNormalEstimator::~DepthNormalEstimator() {
 	LOG(LTRACE) << "Good bye DepthNormalEstimator\n";
 }
 
-bool DepthNormalEstimator::onInit() {
-	LOG(LTRACE) << "DepthNormalEstimator::initialize\n";
-
+void DepthNormalEstimator::prepareInterface() {
 	h_onNewImage.setup(this, &DepthNormalEstimator::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	registerStream("in_img", &in_img);
@@ -38,6 +36,12 @@ bool DepthNormalEstimator::onInit() {
 
 	newNormals = registerEvent("newNormals");
 	registerStream("out_normals", &out_normals);
+}
+
+bool DepthNormalEstimator::onInit() {
+	LOG(LTRACE) << "DepthNormalEstimator::initialize\n";
+
+
 
 	return true;
 }

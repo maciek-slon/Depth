@@ -40,6 +40,7 @@ public:
 	 */
 	virtual ~NormalEstimator();
 
+	void prepareInterface();
 
 protected:
 

@@ -27,10 +27,7 @@ NormalEstimator::~NormalEstimator()
 	LOG(LTRACE) << "Good bye NormalEstimator\n";
 }
 
-bool NormalEstimator::onInit()
-{
-	LOG(LTRACE) << "NormalEstimator::initialize\n";
-
+void NormalEstimator::prepareInterface() {
 	h_onNewImage.setup(this, &NormalEstimator::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 
@@ -43,6 +40,13 @@ bool NormalEstimator::onInit()
 	newNormals = registerEvent("newNormals");
 
 	registerStream("out_normals", &out_normals);
+}
+
+bool NormalEstimator::onInit()
+{
+	LOG(LTRACE) << "NormalEstimator::initialize\n";
+
+
 
 	return true;
 }

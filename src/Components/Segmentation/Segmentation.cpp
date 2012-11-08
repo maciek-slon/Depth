@@ -32,9 +32,7 @@ Segmentation::~Segmentation() {
 	LOG(LTRACE) << "Good bye Segmentation\n";
 }
 
-bool Segmentation::onInit() {
-	LOG(LTRACE) << "Segmentation::initialize\n";
-
+void Segmentation::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 
 	h_onNewDepth.setup(this, &Segmentation::onNewDepth);
@@ -53,6 +51,10 @@ bool Segmentation::onInit() {
 	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
+}
+
+bool Segmentation::onInit() {
+	LOG(LTRACE) << "Segmentation::initialize\n";
 
 	return true;
 }

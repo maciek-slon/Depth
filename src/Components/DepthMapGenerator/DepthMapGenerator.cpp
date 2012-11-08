@@ -26,14 +26,16 @@ DepthMapGenerator::~DepthMapGenerator()
 	LOG(LTRACE) << "Good bye DepthMapGenerator\n";
 }
 
-bool DepthMapGenerator::onInit()
-{
-	LOG(LTRACE) << "DepthMapGenerator::initialize\n";
-
+void DepthMapGenerator::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
+}
+
+bool DepthMapGenerator::onInit()
+{
+	LOG(LTRACE) << "DepthMapGenerator::initialize\n";
 
 	return true;
 }

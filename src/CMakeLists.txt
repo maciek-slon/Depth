@@ -15,10 +15,10 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 # OpenCV library
 FIND_PACKAGE( OpenCV REQUIRED )
 
-FIND_PACKAGE( PCL REQUIRED )
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+#FIND_PACKAGE( PCL REQUIRED )
+#include_directories(${PCL_INCLUDE_DIRS})
+#link_directories(${PCL_LIBRARY_DIRS})
+#add_definitions(${PCL_DEFINITIONS})
 
 # Find another DCLs our one depends on
 # Use macro: DISCODE_FIND_DCL(<DCL_NAME>)
