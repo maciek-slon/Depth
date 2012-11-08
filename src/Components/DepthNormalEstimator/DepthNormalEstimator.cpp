@@ -17,13 +17,13 @@ namespace DepthNormalEstimator {
 DepthNormalEstimator::DepthNormalEstimator(const std::string & name) :
 		Base::Component(name),
 		prop_difference_threshold("difference_threshold", 20) {
-	LOG(LTRACE) << "Hello DepthNormalEstimator\n";
+	LOG(LTRACE)<< "Hello DepthNormalEstimator\n";
 
 	registerProperty(prop_difference_threshold);
 }
 
 DepthNormalEstimator::~DepthNormalEstimator() {
-	LOG(LTRACE) << "Good bye DepthNormalEstimator\n";
+	LOG(LTRACE)<< "Good bye DepthNormalEstimator\n";
 }
 
 void DepthNormalEstimator::prepareInterface() {
@@ -39,21 +39,19 @@ void DepthNormalEstimator::prepareInterface() {
 }
 
 bool DepthNormalEstimator::onInit() {
-	LOG(LTRACE) << "DepthNormalEstimator::initialize\n";
-
-
+	LOG(LTRACE)<< "DepthNormalEstimator::initialize\n";
 
 	return true;
 }
 
 bool DepthNormalEstimator::onFinish() {
-	LOG(LTRACE) << "DepthNormalEstimator::finish\n";
+	LOG(LTRACE)<< "DepthNormalEstimator::finish\n";
 
 	return true;
 }
 
 bool DepthNormalEstimator::onStep() {
-	LOG(LTRACE) << "DepthNormalEstimator::step\n";
+	LOG(LTRACE)<< "DepthNormalEstimator::step\n";
 	return true;
 }
 
@@ -65,7 +63,8 @@ bool DepthNormalEstimator::onStart() {
 	return true;
 }
 
-static void accumBilateral(long delta, long i, long j, long * A, long * b, int threshold) {
+static void accumBilateral(long delta, long i, long j, long * A, long * b,
+		int threshold) {
 	long f = std::abs(delta) < threshold ? 1 : 0;
 
 	const long fi = f * i;
@@ -115,16 +114,26 @@ void DepthNormalEstimator::onNewImage() {
 
 			if (l_d < distance_threshold) {
 				// accum
-				long l_A[4]; l_A[0] = l_A[1] = l_A[2] = l_A[3] = 0;
-				long l_b[2]; l_b[0] = l_b[1] = 0;
-				accumBilateral(lp_line[l_offset0] - l_d, -l_r, -l_r, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset1] - l_d, 0, -l_r, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset2] - l_d, +l_r, -l_r, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset3] - l_d, -l_r, 0, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset4] - l_d, +l_r, 0, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset5] - l_d, -l_r, +l_r, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset6] - l_d, 0, +l_r, l_A, l_b, difference_threshold);
-				accumBilateral(lp_line[l_offset7] - l_d, +l_r, +l_r, l_A, l_b, difference_threshold);
+				long l_A[4];
+				l_A[0] = l_A[1] = l_A[2] = l_A[3] = 0;
+				long l_b[2];
+				l_b[0] = l_b[1] = 0;
+				accumBilateral(lp_line[l_offset0] - l_d, -l_r, -l_r, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset1] - l_d, 0, -l_r, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset2] - l_d, +l_r, -l_r, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset3] - l_d, -l_r, 0, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset4] - l_d, +l_r, 0, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset5] - l_d, -l_r, +l_r, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset6] - l_d, 0, +l_r, l_A, l_b,
+						difference_threshold);
+				accumBilateral(lp_line[l_offset7] - l_d, +l_r, +l_r, l_A, l_b,
+						difference_threshold);
 
 				// solve
 				long l_det = l_A[0] * l_A[3] - l_A[1] * l_A[1];
@@ -146,13 +155,14 @@ void DepthNormalEstimator::onNewImage() {
 					l_ny *= l_norminv;
 					l_nz *= l_norminv;
 
-					normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-l_nx, -l_ny, -l_nz);
+					normals.at<cv::Point3f>(l_y, l_x) = cv::Point3f(-l_nx,
+							-l_ny, -l_nz);
 
 				} else {
-					normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-1, -1, -1);
+					normals.at<cv::Point3f>(l_y, l_x) = cv::Point3f(-1, -1, -1);
 				}
 			} else {
-				normals.at<cv::Point3f>(l_y, l_x)  = cv::Point3f(-1, -1, -1);
+				normals.at<cv::Point3f>(l_y, l_x) = cv::Point3f(-1, -1, -1);
 			}
 			++lp_line;
 		}

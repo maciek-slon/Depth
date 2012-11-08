@@ -12,7 +12,7 @@
 #include "DataStream.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 namespace Processors {
 namespace Segmentation {

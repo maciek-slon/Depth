@@ -15,10 +15,13 @@ namespace Processors {
 namespace Segmentation {
 
 Segmentation::Segmentation(const std::string & name) :
-		Base::Component(name), prop_ang_diff("ang_diff", 2.0f), prop_dist_diff(
-				"dist_diff", 0.02f), prop_color_diff("color_diff", 2.0f), prop_std_diff(
-				"std_diff", 2.0f), prop_threshold("threshold", 3.0f) {
-	LOG(LTRACE) << "Hello Segmentation\n";
+		Base::Component(name),
+		prop_ang_diff("ang_diff", 2.0f),
+		prop_dist_diff("dist_diff", 0.02f),
+		prop_color_diff("color_diff", 2.0f),
+		prop_std_diff("std_diff", 2.0f),
+		prop_threshold("threshold", 3.0f) {
+	LOG(LTRACE)<< "Hello Segmentation\n";
 	m_normals_ready = m_depth_ready = m_color_ready = false;
 
 	registerProperty(prop_ang_diff);
@@ -54,19 +57,19 @@ void Segmentation::prepareInterface() {
 }
 
 bool Segmentation::onInit() {
-	LOG(LTRACE) << "Segmentation::initialize\n";
+	LOG(LTRACE)<< "Segmentation::initialize\n";
 
 	return true;
 }
 
 bool Segmentation::onFinish() {
-	LOG(LTRACE) << "Segmentation::finish\n";
+	LOG(LTRACE)<< "Segmentation::finish\n";
 
 	return true;
 }
 
 bool Segmentation::check(cv::Point point, cv::Point dir) {
-	typedef cv::Point3_<uchar> Point3u;
+	typedef cv::Point3_ <uchar> Point3u;
 
 	float tn = prop_ang_diff;
 	float tp = prop_dist_diff;
@@ -78,17 +81,17 @@ bool Segmentation::check(cv::Point point, cv::Point dir) {
 	if (!dest.inside(cv::Rect(0, 0, 639, 479)))
 		return false;
 
-	if (m_closed.at<uchar>(dest) == 255)
+	if (m_closed.at <uchar>(dest) == 255)
 		return false;
 
-	m_closed.at<uchar>(dest) = 255;
+	m_closed.at <uchar>(dest) = 255;
 
-	cv::Point3f curn = m_normals.at<cv::Point3f>(point);
-	cv::Point3f curd = m_depth.at<cv::Point3f>(point);
-	Point3u curc = m_color.at<Point3u>(point);
-	cv::Point3f desn = m_normals.at<cv::Point3f>(point + dir);
-	cv::Point3f desd = m_depth.at<cv::Point3f>(point + dir);
-	Point3u desc = m_color.at<Point3u>(point + dir);
+	cv::Point3f curn = m_normals.at <cv::Point3f>(point);
+	cv::Point3f curd = m_depth.at <cv::Point3f>(point);
+	Point3u curc = m_color.at <Point3u>(point);
+	cv::Point3f desn = m_normals.at <cv::Point3f>(point + dir);
+	cv::Point3f desd = m_depth.at <cv::Point3f>(point + dir);
+	Point3u desc = m_color.at <Point3u>(point + dir);
 
 	float dn = 180. / 3.14 * acos(curn.dot(desn));
 	dn = dn < 180 ? dn : 0;
@@ -98,14 +101,13 @@ bool Segmentation::check(cv::Point point, cv::Point dir) {
 	cv::Point3f distc = desc;
 	cv::Point3f distc2 = curc;
 	distc -= distc2;
-	distc *= 1./255;
+	distc *= 1. / 255;
 
 	float dc = norm(distc);
 
 	float difference = dc / tc + dp / tp + dn / tn;
 
 	return difference < ts;
-	// return ((angle < ang_diff && dist < dist_diff)); // || cdist < color_diff );
 }
 
 bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
@@ -115,15 +117,15 @@ bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
 bool Segmentation::onStep() {
 	try {
 		m_depth_ready = m_normals_ready = m_color_ready = false;
-		typedef cv::Point3_<uchar> CvColor;
-		LOG(LDEBUG) << "Segmentation::step\n";
+		typedef cv::Point3_ <uchar> CvColor;
+		LOG(LDEBUG)<< "Segmentation::step\n";
 		m_clusters = cv::Mat::zeros(cv::Size(640, 480), CV_8UC3);
 		m_closed = cv::Mat::zeros(cv::Size(640, 480), CV_8UC1);
 
 		CvColor empty(0, 0, 0);
 
-		std::queue<cv::Point> open;
-		std::queue<cv::Point> seed;
+		std::queue <cv::Point> open;
+		std::queue <cv::Point> seed;
 
 		for (int x = 0; x < 640; x += 10)
 			for (int y = 0; y < 480; y += 10)
@@ -136,16 +138,16 @@ bool Segmentation::onStep() {
 
 		srand(0);
 
-		std::queue<cv::Point3f> blob_normals;
-		std::queue<cv::Point3f> blob_points;
+		std::queue <cv::Point3f> blob_normals;
+		std::queue <cv::Point3f> blob_points;
 		while (!seed.empty()) {
 
-			open = std::queue<cv::Point>();
+			open = std::queue <cv::Point>();
 
 			cv::Point pt = seed.front();
 			seed.pop();
 			// ignore already segmented seeds
-			if (m_clusters.at<CvColor>(pt) != empty) {
+			if (m_clusters.at <CvColor>(pt) != empty) {
 				continue;
 			}
 
@@ -156,24 +158,23 @@ bool Segmentation::onStep() {
 			float acc = 0;
 			float acc2 = 0;
 			float angle;
-			//std::vector<int> inliers;
 
-			LOG(LDEBUG) << "Growing";
+			LOG(LDEBUG)<< "Growing";
 			// growing segment
 			while (!open.empty()) {
 
 				cv::Point curpoint = open.front();
 				open.pop();
-				if (m_clusters.at<CvColor>(curpoint) != empty)
+				if (m_clusters.at <CvColor>(curpoint) != empty)
 					continue;
 
-				cv::Point3f p = m_depth.at<cv::Point3f>(curpoint);
+				cv::Point3f p = m_depth.at <cv::Point3f>(curpoint);
 				point_mean += p;
 
-				blob_normals.push(m_normals.at<cv::Point3f>(curpoint));
+				blob_normals.push(m_normals.at <cv::Point3f>(curpoint));
 				blob_points.push(p);
 
-				m_clusters.at<CvColor>(curpoint) = id;
+				m_clusters.at <CvColor>(curpoint) = id;
 				size++;
 				if (check(curpoint, right))
 					open.push(curpoint + right);
@@ -186,7 +187,7 @@ bool Segmentation::onStep() {
 			}
 
 			//if (blob_normals.size() > 1)
-				LOG(LDEBUG) << "Normals: " << blob_normals.size();
+			LOG(LDEBUG)<< "Normals: " << blob_normals.size();
 
 			// calculating features for segment
 			point_mean *= 1.0f / size;
@@ -206,32 +207,33 @@ bool Segmentation::onStep() {
 				blob_points.pop();
 			}
 
-			LOG(LDEBUG) << "Calculated";
+			LOG(LDEBUG)<< "Calculated";
 
 			// calculate mean angle and it's deviation
 			float mean = acc / size;
-			float std_dev = sqrt(((size * acc2) - (acc * acc)) / (size * (size - 1)));
+			float std_dev = sqrt(
+					((size * acc2) - (acc * acc)) / (size * (size - 1)));
 
 			/*if (std_dev > 20)
-				cv::floodFill(m_clusters, pt, cv::Scalar(mean, mean, mean));
-			else if (mean < 70)
-				cv::floodFill(m_clusters, pt, cv::Scalar(mean * 1.5, 0, 0));
-			else if (mean < 100)
-				cv::floodFill(m_clusters, pt, cv::Scalar(0, mean * 1.5, 0));
-			else
-				cv::floodFill(m_clusters, pt, cv::Scalar(0, 0, mean * 1.5));*/
+			 cv::floodFill(m_clusters, pt, cv::Scalar(mean, mean, mean));
+			 else if (mean < 70)
+			 cv::floodFill(m_clusters, pt, cv::Scalar(mean * 1.5, 0, 0));
+			 else if (mean < 100)
+			 cv::floodFill(m_clusters, pt, cv::Scalar(0, mean * 1.5, 0));
+			 else
+			 cv::floodFill(m_clusters, pt, cv::Scalar(0, 0, mean * 1.5));*/
 
-			LOG(LDEBUG) << "Flooded";
+			LOG(LDEBUG)<< "Flooded";
 		}
 
-		LOG(LDEBUG) << "Finishing";
+		LOG(LDEBUG)<< "Finishing";
 
 		cv::medianBlur(m_clusters, m_clusters, 5);
 
 		out_img.write(m_clusters.clone());
 		newImage->raise();
 	} catch (...) {
-		LOG(LERROR) << "Segmentation::onStep failed\n";
+		LOG(LERROR)<< "Segmentation::onStep failed\n";
 	}
 	return true;
 }
@@ -245,30 +247,30 @@ bool Segmentation::onStart() {
 }
 
 void Segmentation::onNewDepth() {
-	LOG(LTRACE) << "New depth";
+	LOG(LTRACE)<< "New depth";
 	m_depth = in_depth.read().clone();
 	m_depth_ready = true;
 
 	if (m_depth_ready && m_normals_ready && m_color_ready)
-		onStep();
+	onStep();
 }
 
 void Segmentation::onNewColor() {
-	LOG(LTRACE) << "New color";
+	LOG(LTRACE)<< "New color";
 	m_color = in_color.read().clone();
 	m_color_ready = true;
 
 	if (m_depth_ready && m_normals_ready && m_color_ready)
-		onStep();
+	onStep();
 }
 
 void Segmentation::onNewNormals() {
-	LOG(LTRACE) << "New normals";
+	LOG(LTRACE)<< "New normals";
 	m_normals = in_normals.read().clone();
 	m_normals_ready = true;
 
 	if (m_depth_ready && m_normals_ready && m_color_ready)
-		onStep();
+	onStep();
 }
 
 } //: namespace Segmentation
