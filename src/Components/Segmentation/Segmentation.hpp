@@ -11,11 +11,23 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
+#include "EventHandler2.hpp"
 
 #include <opencv2/opencv.hpp>
 
 namespace Processors {
 namespace Segmentation {
+
+typedef double (*Comparator)(unsigned char *, unsigned char *, double);
+
+double compareNormals(unsigned char * v1, unsigned char * v2, double n);
+double compareColors(unsigned char * v1, unsigned char * v2, double n);
+double comparePositions(unsigned char * v1, unsigned char * v2, double n);
+
+typedef double (*Accumulator)(std::vector<double>);
+
+double accumulateSum(std::vector<double> values);
+double accumulateMax(std::vector<double> values);
 
 /*!
  * \class Segmentation
@@ -71,6 +83,17 @@ protected:
 	/// Event handler.
 	Base::EventHandler<Segmentation> h_onNewNormals;
 
+	/// Event handlers
+	Base::EventHandler2 h_onColor;
+
+	Base::EventHandler2 h_onColorDepth;
+
+	Base::EventHandler2 h_onColorDepthNormals;
+
+	Base::EventHandler2 h_onDepth;
+
+	Base::EventHandler2 h_onDepthNormals;
+
 	/// Input data stream
 	Base::DataStreamIn<cv::Mat> in_depth;
 
@@ -105,6 +128,11 @@ private:
 	void onNewDepth();
 	void onNewColor();
 	void onNewNormals();
+
+	void onNewData(bool color, bool depth, bool normals);
+
+	cv::Mat multimodalSegmentation(std::vector<cv::Mat> inputs, std::vector<Comparator> comparators, std::vector<double> thresholds, Accumulator accumulator, double threshold);
+	bool check(cv::Point point, cv::Point dir, std::vector<cv::Mat> inputs, std::vector<Comparator> comparators, std::vector<double> thresholds, Accumulator accumulator, double threshold);
 
 	bool check(cv::Point point, cv::Point dir);
 	bool newSeed(cv::Point point, cv::Point dir);
