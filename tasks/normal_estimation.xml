@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Maciej Stefańczyk</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Normal estimation test.</brief>
+			<full>Estimation of normal vectors using both available methods.</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="Exec1"  period="2">
+				<Component name="Source" type="CameraNUI:CameraNUI" priority="1" bump="0">
+					<param name="lib">freenect</param>
+					<param name="skip_stop">1</param>
+					<param name="camera_mode">rgb</param>
+				</Component>
+				
+				<Component name="DepthConverter" type="CameraNUI:DepthConverter" priority="2" bump="0">
+					<param name="depth_mode">point_cloud</param>
+				</Component>
+				
+				<Component name="DepthNormalEstimator" type="Depth:DepthNormalEstimator" priority="3" bump="0">
+				</Component>
+				
+				<Component name="NormalEstimator" type="Depth:NormalEstimator" priority="4" bump="0">
+				</Component>
+			</Executor>
+		</Subtask>
+		
+		<Subtask name="Visualisation">
+			<Executor name="Exec2" period="0.2">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="5">
+					<param name="count">3</param>
+					<param name="title">RGB,Normals,DepthNormals</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Source.out_img">
+			<sink>Window.in_img0</sink>	
+		</Source>
+		<Source name="Source.out_depth">
+			<sink>DepthConverter.in_depth</sink>
+			<sink>DepthNormalEstimator.in_depth</sink>
+		</Source>
+		<Source name="DepthConverter.out_depth">
+			<sink>NormalEstimator.in_cloud</sink>		
+		</Source>
+		<Source name="NormalEstimator.out_img">
+			<sink>Window.in_img1</sink>		
+		</Source>
+		<Source name="DepthNormalEstimator.out_img">
+			<sink>Window.in_img2</sink>		
+		</Source>
+	</DataStreams>
+</Task>
+
+
+
+

@@ -11,6 +11,8 @@
 
 #include <cmath>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 namespace Processors {
 namespace DepthNormalEstimator {
 

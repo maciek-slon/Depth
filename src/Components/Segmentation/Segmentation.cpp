@@ -15,6 +15,8 @@
 
 #include <boost/bind.hpp>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 namespace Processors {
 namespace Segmentation {
 

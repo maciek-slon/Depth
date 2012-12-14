@@ -13,7 +13,7 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
 
 namespace Processors {
 namespace Segmentation {

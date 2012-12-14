@@ -31,7 +31,7 @@ void NormalEstimator::prepareInterface() {
 	h_onNewImage.setup(this, &NormalEstimator::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 
-	registerStream("in_img", &in_img);
+	registerStream("in_cloud", &in_img);
 
 	newImage = registerEvent("newImage");
 
@@ -40,6 +40,8 @@ void NormalEstimator::prepareInterface() {
 	newNormals = registerEvent("newNormals");
 
 	registerStream("out_normals", &out_normals);
+
+	addDependency("onNewImage", &in_img);
 }
 
 bool NormalEstimator::onInit()
