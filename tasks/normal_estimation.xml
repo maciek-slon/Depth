@@ -27,19 +27,23 @@
 					<param name="depth_mode">point_cloud</param>
 				</Component>
 				
-				<Component name="DepthNormalEstimator" type="Depth:DepthNormalEstimator" priority="3" bump="0">
+				<Component name="ProcNorm" type="CameraNUI:DepthConverter" priority="3" bump="0">
+					<param name="depth_mode">normalized</param>
 				</Component>
 				
-				<Component name="NormalEstimator" type="Depth:NormalEstimator" priority="4" bump="0">
+				<Component name="DepthNormalEstimator" type="Depth:DepthNormalEstimator" priority="4" bump="0">
+				</Component>
+				
+				<Component name="NormalEstimator" type="Depth:NormalEstimator" priority="5" bump="0">
 				</Component>
 			</Executor>
 		</Subtask>
 		
 		<Subtask name="Visualisation">
 			<Executor name="Exec2" period="0.2">
-				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="5">
-					<param name="count">3</param>
-					<param name="title">RGB,Normals,DepthNormals</param>
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
+					<param name="count">4</param>
+					<param name="title">RGB,Normals,DepthNormals,Depth</param>
 				</Component>
 			</Executor>
 		</Subtask>	
@@ -53,6 +57,7 @@
 		</Source>
 		<Source name="Source.out_depth">
 			<sink>DepthConverter.in_depth</sink>
+			<sink>ProcNorm.in_depth</sink>
 			<sink>DepthNormalEstimator.in_depth</sink>
 		</Source>
 		<Source name="DepthConverter.out_depth">
@@ -63,6 +68,9 @@
 		</Source>
 		<Source name="DepthNormalEstimator.out_img">
 			<sink>Window.in_img2</sink>		
+		</Source>
+		<Source name="ProcNorm.out_img">
+			<sink>Window.in_img3</sink>		
 		</Source>
 	</DataStreams>
 </Task>

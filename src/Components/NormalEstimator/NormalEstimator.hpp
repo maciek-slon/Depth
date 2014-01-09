@@ -75,16 +75,10 @@ protected:
 	Base::EventHandler <NormalEstimator> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <cv::Mat> in_img;
-
-	/// Event raised, when image is processed
-	Base::Event * newImage;
+	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_img;
 
 	/// Output data stream - processed image
 	Base::DataStreamOut <cv::Mat> out_img;
-
-	/// Event raised, when image is processed
-	Base::Event * newNormals;
 
 	/// Output data stream - processed image
 	Base::DataStreamOut <cv::Mat> out_normals;

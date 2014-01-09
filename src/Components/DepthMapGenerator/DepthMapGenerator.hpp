@@ -62,10 +62,6 @@ protected:
 	 */
 	bool onStop();
 
-
-	/// Event raised, when image is ready
-	Base::Event * newImage;
-
 	/// Output data stream - generated image
 	Base::DataStreamOut <cv::Mat> out_img;
 

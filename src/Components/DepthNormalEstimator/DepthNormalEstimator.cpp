@@ -30,16 +30,14 @@ DepthNormalEstimator::~DepthNormalEstimator() {
 
 void DepthNormalEstimator::prepareInterface() {
 	h_onNewImage.setup(this, &DepthNormalEstimator::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+
 	registerStream("in_depth", &in_img);
-
-	newImage = registerEvent("newImage");
 	registerStream("out_img", &out_img);
-
-	newNormals = registerEvent("newNormals");
 	registerStream("out_normals", &out_normals);
 
+	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
+
 }
 
 bool DepthNormalEstimator::onInit() {
@@ -176,10 +174,8 @@ void DepthNormalEstimator::onNewImage() {
 	cv::cvtColor(out, out, CV_RGB2BGR);
 
 	out_img.write(out.clone());
-	newImage->raise();
 
 	out_normals.write(normals.clone());
-	newNormals->raise();
 }
 
 } //: namespace DepthNormalEstimator

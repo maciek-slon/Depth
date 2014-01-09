@@ -95,7 +95,7 @@ void Segmentation::prepareInterface() {
 	registerStream("in_color", &in_color);
 	registerStream("in_normals", &in_normals);
 
-	newImage = registerEvent("newImage");
+	//newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
 
@@ -110,7 +110,7 @@ void Segmentation::prepareInterface() {
 
 	h_onColorDepthNormals.setup(boost::bind(&Segmentation::onNewData, this, true, true, true));
 	registerHandler("onColorDepethNormals", &h_onColorDepthNormals);
-	addDependency("onColorDepthNormalas", &in_color);
+	addDependency("onColorDepthNormals", &in_color);
 	addDependency("onColorDepthNormals", &in_depth);
 	addDependency("onColorDepthNormals", &in_normals);
 
@@ -434,7 +434,7 @@ bool Segmentation::onStep() {
 		cv::medianBlur(m_clusters, m_clusters, 5);
 
 		out_img.write(m_clusters.clone());
-		newImage->raise();
+		//newImage->raise();
 	} catch (...) {
 		LOG(LERROR)<< "Segmentation::onStep failed\n";
 	}

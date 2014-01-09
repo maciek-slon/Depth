@@ -33,15 +33,15 @@ void NormalEstimator::prepareInterface() {
 
 	registerStream("in_cloud", &in_img);
 
-	newImage = registerEvent("newImage");
+	//newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
+	addDependency("onNewImage", &in_img);
 
-	newNormals = registerEvent("newNormals");
+	//newNormals = registerEvent("newNormals");
 
 	registerStream("out_normals", &out_normals);
 
-	addDependency("onNewImage", &in_img);
 }
 
 bool NormalEstimator::onInit()
@@ -196,9 +196,7 @@ void NormalEstimator::onNewImage() {
 
 		LOG(LNOTICE) << t1 << ", " << t2-t1;
 		out_img.write(out.clone());
-		newImage->raise();
 		out_normals.write(normals);
-		newNormals->raise();
 	} catch (const exception& ex) {
 		LOG(LERROR) << "NormalEstimator::onNewImage() failed. " << ex.what() << endl;
 	}

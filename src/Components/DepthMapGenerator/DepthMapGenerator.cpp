@@ -27,8 +27,6 @@ DepthMapGenerator::~DepthMapGenerator()
 }
 
 void DepthMapGenerator::prepareInterface() {
-	// Register data streams, events and event handlers HERE!
-	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
 }
@@ -76,7 +74,6 @@ bool DepthMapGenerator::onStep()
 	}
 
 	out_img.write(m_image);
-	newImage->raise();
 
 	return true;
 }

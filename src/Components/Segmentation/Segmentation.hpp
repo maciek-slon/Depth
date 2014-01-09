@@ -102,9 +102,9 @@ protected:
 
 	/// Input data stream
 	Base::DataStreamIn<cv::Mat> in_normals;
-
-	/// Event raised, when image is processed
-	Base::Event * newImage;
+//
+//	/// Event raised, when image is processed
+//	Base::Event * newImage;
 
 	/// Output data stream - processed image
 	Base::DataStreamOut<cv::Mat> out_img;
