@@ -8,7 +8,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -100,6 +99,6 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("NormalEstimator", Processors::NormalEstimator::NormalEstimator, Common::Panel_Empty)
+REGISTER_COMPONENT("NormalEstimator", Processors::NormalEstimator::NormalEstimator)
 
 #endif /* NORMALESTIMATOR_HPP_ */

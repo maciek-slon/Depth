@@ -8,7 +8,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -92,6 +91,6 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("DepthNormalEstimator", Processors::DepthNormalEstimator::DepthNormalEstimator, Common::Panel_Empty)
+REGISTER_COMPONENT("DepthNormalEstimator", Processors::DepthNormalEstimator::DepthNormalEstimator)
 
 #endif /* DEPTHNORMALESTIMATOR_HPP_ */

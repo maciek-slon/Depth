@@ -8,7 +8,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 
 #include <opencv2/core/core.hpp>
@@ -78,6 +77,6 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("DepthMapGenerator", Processors::DepthMapGenerator::DepthMapGenerator, Common::Panel_Empty)
+REGISTER_COMPONENT("DepthMapGenerator", Processors::DepthMapGenerator::DepthMapGenerator)
 
 #endif /* DEPTHMAPGENERATOR_HPP_ */

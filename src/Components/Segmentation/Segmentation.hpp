@@ -8,7 +8,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 #include "EventHandler2.hpp"
@@ -155,7 +154,6 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("Segmentation",
-		Processors::Segmentation::Segmentation, Common::Panel_Empty)
+REGISTER_COMPONENT("Segmentation", Processors::Segmentation::Segmentation)
 
 #endif /* SEGMENTATION_HPP_ */
