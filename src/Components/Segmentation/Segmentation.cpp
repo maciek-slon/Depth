@@ -91,7 +91,7 @@ void Segmentation::prepareInterface() {
 	h_onNewNormals.setup(this, &Segmentation::onNewNormals);
 	registerHandler("onNewNormals", &h_onNewNormals);
 
-	registerStream("in_or depth", &in_depth);
+	registerStream("in_depth", &in_depth);
 	registerStream("in_color", &in_color);
 	registerStream("in_normals", &in_normals);
 
