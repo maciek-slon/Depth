@@ -109,7 +109,7 @@ void Segmentation::prepareInterface() {
 	addDependency("onColorDepth", &in_depth);
 
 	h_onColorDepthNormals.setup(boost::bind(&Segmentation::onNewData, this, true, true, true));
-	registerHandler("onColorDepethNormals", &h_onColorDepthNormals);
+	registerHandler("onColorDepthNormals", &h_onColorDepthNormals);
 	addDependency("onColorDepthNormals", &in_color);
 	addDependency("onColorDepthNormals", &in_depth);
 	addDependency("onColorDepthNormals", &in_normals);
@@ -288,6 +288,7 @@ cv::Mat Segmentation::multimodalSegmentation(std::vector<cv::Mat> inputs,
 }
 
 void Segmentation::onNewData(bool color, bool depth, bool normals) {
+	CLOG(LTRACE) << "OnNewData " << color << depth << normals;
 	std::vector<cv::Mat> inputs;
 	std::vector<Comparator> comparators;
 	std::vector<double> thresholds;
