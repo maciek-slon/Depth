@@ -59,11 +59,6 @@ protected:
 	bool onFinish();
 
 	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
-
-	/*!
 	 * Start component
 	 */
 	bool onStart();
@@ -72,15 +67,6 @@ protected:
 	 * Stop component
 	 */
 	bool onStop();
-
-	/// Event handler.
-	Base::EventHandler<Segmentation> h_onNewDepth;
-
-	/// Event handler.
-	Base::EventHandler<Segmentation> h_onNewColor;
-
-	/// Event handler.
-	Base::EventHandler<Segmentation> h_onNewNormals;
 
 	/// Event handlers
 	Base::EventHandler2 h_onColor;
@@ -101,9 +87,6 @@ protected:
 
 	/// Input data stream
 	Base::DataStreamIn<cv::Mat> in_normals;
-//
-//	/// Event raised, when image is processed
-//	Base::Event * newImage;
 
 	/// Output data stream - processed image
 	Base::DataStreamOut<cv::Mat> out_img;
@@ -124,10 +107,6 @@ protected:
 
 private:
 
-	void onNewDepth();
-	void onNewColor();
-	void onNewNormals();
-
 	void onNewData(bool color, bool depth, bool normals);
 
 	cv::Mat multimodalSegmentation(std::vector<cv::Mat> inputs, std::vector<Comparator> comparators, std::vector<double> thresholds, Accumulator accumulator, double threshold);
@@ -142,10 +121,10 @@ private:
 
 	cv::Mat m_clusters;
 	cv::Mat m_closed;
-
+/*
 	bool m_normals_ready;
 	bool m_depth_ready;
-	bool m_color_ready;
+	bool m_color_ready;*/
 };
 
 } //: namespace Segmentation

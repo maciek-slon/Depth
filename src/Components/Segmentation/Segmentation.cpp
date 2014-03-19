@@ -66,7 +66,6 @@ Segmentation::Segmentation(const std::string & name) :
 		prop_std_diff("std_diff", 2.0f),
 		prop_threshold("threshold", 3.0f) {
 	LOG(LTRACE)<< "Hello Segmentation\n";
-	m_normals_ready = m_depth_ready = m_color_ready = false;
 
 	registerProperty(prop_ang_diff);
 	registerProperty(prop_dist_diff);
@@ -82,20 +81,9 @@ Segmentation::~Segmentation() {
 void Segmentation::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 
-	h_onNewDepth.setup(this, &Segmentation::onNewDepth);
-	registerHandler("onNewDepth", &h_onNewDepth);
-
-	h_onNewColor.setup(this, &Segmentation::onNewColor);
-	registerHandler("onNewColor", &h_onNewColor);
-
-	h_onNewNormals.setup(this, &Segmentation::onNewNormals);
-	registerHandler("onNewNormals", &h_onNewNormals);
-
 	registerStream("in_depth", &in_depth);
 	registerStream("in_color", &in_color);
 	registerStream("in_normals", &in_normals);
-
-	//newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
 
@@ -318,160 +306,12 @@ bool Segmentation::newSeed(cv::Point point, cv::Point dir) {
 	return true;
 }
 
-bool Segmentation::onStep() {
-	try {
-		m_depth_ready = m_normals_ready = m_color_ready = false;
-		typedef cv::Point3_<uchar> CvColor;
-		LOG(LDEBUG)<< "Segmentation::step\n";
-		m_clusters = cv::Mat::zeros(cv::Size(640, 480), CV_8UC3);
-		m_closed = cv::Mat::zeros(cv::Size(640, 480), CV_8UC1);
-
-		CvColor empty(0, 0, 0);
-
-		std::queue<cv::Point> open;
-		std::queue<cv::Point> seed;
-
-		for (int x = 0; x < 640; x += 10)
-			for (int y = 0; y < 480; y += 10)
-				seed.push(cv::Point(x, y));
-
-		cv::Point right(1, 0);
-		cv::Point left(-1, 0);
-		cv::Point up(0, -1);
-		cv::Point down(0, 1);
-
-		srand(0);
-
-		std::queue<cv::Point3f> blob_normals;
-		std::queue<cv::Point3f> blob_points;
-		while (!seed.empty()) {
-
-			open = std::queue<cv::Point>();
-
-			cv::Point pt = seed.front();
-			seed.pop();
-			// ignore already segmented seeds
-			if (m_clusters.at<CvColor>(pt) != empty) {
-				continue;
-			}
-
-			cv::Point3i id(0, rand() % 128, rand() % 128);
-			int size = 0;
-			cv::Point3f point_mean(0, 0, 0);
-			open.push(pt);
-			float acc = 0;
-			float acc2 = 0;
-			float angle;
-
-			LOG(LDEBUG)<< "Growing";
-			// growing segment
-			while (!open.empty()) {
-
-				cv::Point curpoint = open.front();
-				open.pop();
-				if (m_clusters.at<CvColor>(curpoint) != empty)
-					continue;
-
-				cv::Point3f p = m_depth.at<cv::Point3f>(curpoint);
-				point_mean += p;
-
-				blob_normals.push(m_normals.at<cv::Point3f>(curpoint));
-				blob_points.push(p);
-
-				m_clusters.at<CvColor>(curpoint) = id;
-				size++;
-				if (check(curpoint, right))
-					open.push(curpoint + right);
-				if (check(curpoint, left))
-					open.push(curpoint + left);
-				if (check(curpoint, up))
-					open.push(curpoint + up);
-				if (check(curpoint, down))
-					open.push(curpoint + down);
-			}
-
-			//if (blob_normals.size() > 1)
-			LOG(LDEBUG)<< "Normals: " << blob_normals.size();
-
-			// calculating features for segment
-			point_mean *= 1.0f / size;
-
-			acc = acc2 = 0;
-			while (!blob_normals.empty()) {
-				// normalized vector from point to center of mass
-				cv::Point3f ntc = point_mean - blob_points.front();
-				ntc *= 1.0f / norm(ntc);
-				// normal in current point
-				cv::Point3f nor = blob_normals.front();
-				// angle between both vectors
-				angle = 180. / 3.14 * acos(nor.dot(ntc));
-				acc += angle;
-				acc2 += angle * angle;
-				blob_normals.pop();
-				blob_points.pop();
-			}
-
-			LOG(LDEBUG)<< "Calculated";
-
-			// calculate mean angle and it's deviation
-			float mean = acc / size;
-			float std_dev = sqrt(
-					((size * acc2) - (acc * acc)) / (size * (size - 1)));
-
-			/*if (std_dev > 20)
-			 cv::floodFill(m_clusters, pt, cv::Scalar(mean, mean, mean));
-			 else if (mean < 70)
-			 cv::floodFill(m_clusters, pt, cv::Scalar(mean * 1.5, 0, 0));
-			 else if (mean < 100)
-			 cv::floodFill(m_clusters, pt, cv::Scalar(0, mean * 1.5, 0));
-			 else
-			 cv::floodFill(m_clusters, pt, cv::Scalar(0, 0, mean * 1.5));*/
-
-			LOG(LDEBUG)<< "Flooded";
-		}
-
-		LOG(LDEBUG)<< "Finishing";
-
-		cv::medianBlur(m_clusters, m_clusters, 5);
-
-		out_img.write(m_clusters.clone());
-		//newImage->raise();
-	} catch (...) {
-		LOG(LERROR)<< "Segmentation::onStep failed\n";
-	}
-	return true;
-}
-
 bool Segmentation::onStop() {
 	return true;
 }
 
 bool Segmentation::onStart() {
 	return true;
-}
-
-void Segmentation::onNewDepth() {
-	LOG(LTRACE)<< "New depth";
-	m_depth = in_depth.read().clone();
-	m_depth_ready = true;
-
-	if (m_depth_ready && m_normals_ready && m_color_ready) onStep();
-}
-
-void Segmentation::onNewColor() {
-	LOG(LTRACE)<< "New color";
-	m_color = in_color.read().clone();
-	m_color_ready = true;
-
-	if (m_depth_ready && m_normals_ready && m_color_ready) onStep();
-}
-
-void Segmentation::onNewNormals() {
-	LOG(LTRACE)<< "New normals";
-	m_normals = in_normals.read().clone();
-	m_normals_ready = true;
-
-	if (m_depth_ready && m_normals_ready && m_color_ready) onStep();
 }
 
 } //: namespace Segmentation
