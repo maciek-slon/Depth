@@ -6,3 +6,5 @@ ADD_COMPONENT(DepthMapGenerator)
 ADD_COMPONENT(Segmentation)
 
 ADD_COMPONENT(DepthNormalEstimator)
+
+ADD_COMPONENT(DepthTransform)
