@@ -76,16 +76,11 @@ void DepthTransform::DepthTransformation() {
 	CLOG(LDEBUG) << "Input homogenous matrix:\n" << tmp_hm;
 
 	// Check inversion property.
-	if (prop_inverse){
+	if (prop_inverse)
 		hm.matrix() = tmp_hm.matrix().inverse();
-	}
 	else
 		hm = tmp_hm;
-
-	// Temporary point.
-	Eigen::Vector4d pt;
-
-	CLOG(LINFO) << "Using homogenous matrix:\n" << hm;
+	CLOG(LINFO) << "Using Homogenous matrix (after inversion):\n" << hm;
 
 	// If passthrough - return the input image.
 	if (pass_through) {
@@ -109,7 +104,7 @@ void DepthTransform::DepthTransformation() {
 	
 
 	// Perform transformation of coordinates.
-	cv::Matx44d H = tmp_hm;
+	cv::Matx44d H = hm;
 	perspectiveTransform(img, out_img, H);
 
 
@@ -121,7 +116,6 @@ void DepthTransform::DepthTransformation() {
 	if (img_type == CV_32F) {
 		// float variant
 		float* p;
-//		const float bad_point = std::numeric_limits<float>::quiet_NaN();
 		for( i = 0; i < rows; ++i) {
 			p = out_img.ptr<float>(i);
 			for ( j = 0; j < cols; ++j) {
@@ -133,7 +127,6 @@ void DepthTransform::DepthTransformation() {
 	} else {
 		// double variant
 		double* p;
-//		const double bad_point = std::numeric_limits<double>::quiet_NaN();
 		for( i = 0; i < rows; ++i) {
 			p = out_img.ptr<double>(i);
 			for ( j = 0; j < cols; ++j) {
