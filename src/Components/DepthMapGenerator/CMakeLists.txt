@@ -8,9 +8,6 @@ FILE(GLOB files *.cpp)
 ADD_LIBRARY(DepthMapGenerator SHARED ${files})
 
 # Link external libraries
-# TARGET_LINK_LIBRARIES(DepthMapGenerator ${DisCODe_LIBRARIES} )
-
-# Add aother libraries if necessary, for example:
-TARGET_LINK_LIBRARIES(DepthMapGenerator ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(DepthMapGenerator ${DisCODe_LIBRARIES})
 
 INSTALL_COMPONENT(DepthMapGenerator)

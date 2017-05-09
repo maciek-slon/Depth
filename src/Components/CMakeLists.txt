@@ -8,3 +8,5 @@ ADD_COMPONENT(Segmentation)
 ADD_COMPONENT(DepthNormalEstimator)
 
 ADD_COMPONENT(PassThrough)
+
+ADD_COMPONENT(DepthTransform)

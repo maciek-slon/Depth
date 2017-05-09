@@ -7,10 +7,7 @@ FILE(GLOB files *.cpp)
 # Create an executable file from sources:
 ADD_LIBRARY(NormalEstimator SHARED ${files})
 
-# Link external libraries
-# TARGET_LINK_LIBRARIES(NormalEstimator ${DisCODe_LIBRARIES} )
-
 # Add aother libraries if necessary, for example:
-TARGET_LINK_LIBRARIES(NormalEstimator ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(NormalEstimator ${DisCODe_LIBRARIES} )
 
 INSTALL_COMPONENT(NormalEstimator)

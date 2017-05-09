@@ -5,9 +5,9 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
-ADD_LIBRARY(Segmentation SHARED ${files})
+ADD_LIBRARY(DepthTransform SHARED ${files})
 
-# Add aother libraries if necessary, for example:
-TARGET_LINK_LIBRARIES(Segmentation ${DisCODe_LIBRARIES} )
+# Link external libraries
+TARGET_LINK_LIBRARIES(DepthTransform ${DisCODe_LIBRARIES} )
 
-INSTALL_COMPONENT(Segmentation)
+INSTALL_COMPONENT(DepthTransform)
