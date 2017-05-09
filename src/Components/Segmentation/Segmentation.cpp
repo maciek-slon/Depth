@@ -185,7 +185,7 @@ bool Segmentation::check(cv::Point point, cv::Point dir,
 	m_closed.at<uchar>(dest) = 255;
 
 	// intermediate results
-	std:cumulate:vector<double> results;
+	std::vector<double> results;
 
 	// iterate over all available inputs
 	for (int i = 0; i < inputs.size(); ++i) {

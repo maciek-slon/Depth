@@ -18,7 +18,7 @@ namespace DepthNormalEstimator {
 
 DepthNormalEstimator::DepthNormalEstimator(const std::string & name) :
 		Base::Component(name),
-		prop_difference_threshold("difference_threshold", 20) {
+		prop_difference_threshold("difference_threshold", 20, "range") {
 	LOG(LTRACE)<< "Hello DepthNormalEstimator\n";
 
 	registerProperty(prop_difference_threshold);

@@ -16,15 +16,11 @@
 	<!-- task definition -->
 	<Subtasks>
 		<Subtask name="Processing">
-			<Executor name="Exec1"  period="2">
+			<Executor name="Exec1"  period="0.1">
 				<Component name="Source" type="CameraNUI:CameraNUI" priority="1" bump="0">
 					<param name="lib">freenect</param>
 					<param name="skip_stop">1</param>
 					<param name="camera_mode">rgb</param>
-				</Component>
-				
-				<Component name="DepthConverter" type="CameraNUI:DepthConverter" priority="2" bump="0">
-					<param name="depth_mode">point_cloud</param>
 				</Component>
 				
 				<Component name="ProcNorm" type="CameraNUI:DepthConverter" priority="3" bump="0">
@@ -33,17 +29,14 @@
 				
 				<Component name="DepthNormalEstimator" type="Depth:DepthNormalEstimator" priority="4" bump="0">
 				</Component>
-				
-				<Component name="NormalEstimator" type="Depth:NormalEstimator" priority="5" bump="0">
-				</Component>
 			</Executor>
 		</Subtask>
 		
 		<Subtask name="Visualisation">
-			<Executor name="Exec2" period="0.2">
+			<Executor name="Exec2" period="0.05">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
-					<param name="count">4</param>
-					<param name="title">RGB,Normals,DepthNormals,Depth</param>
+					<param name="count">3</param>
+					<param name="title">RGB,DepthNormals,Depth</param>
 				</Component>
 			</Executor>
 		</Subtask>	
@@ -56,21 +49,14 @@
 			<sink>Window.in_img0</sink>	
 		</Source>
 		<Source name="Source.out_depth">
-			<sink>DepthConverter.in_depth</sink>
 			<sink>ProcNorm.in_depth</sink>
 			<sink>DepthNormalEstimator.in_depth</sink>
 		</Source>
-		<Source name="DepthConverter.out_depth">
-			<sink>NormalEstimator.in_cloud</sink>		
-		</Source>
-		<Source name="NormalEstimator.out_img">
+		<Source name="DepthNormalEstimator.out_img">
 			<sink>Window.in_img1</sink>		
 		</Source>
-		<Source name="DepthNormalEstimator.out_img">
-			<sink>Window.in_img2</sink>		
-		</Source>
 		<Source name="ProcNorm.out_img">
-			<sink>Window.in_img3</sink>		
+			<sink>Window.in_img2</sink>		
 		</Source>
 	</DataStreams>
 </Task>

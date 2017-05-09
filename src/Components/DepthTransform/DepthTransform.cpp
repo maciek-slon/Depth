@@ -10,7 +10,6 @@
 #include "DepthTransform.hpp"
 #include "Common/Logger.hpp"
 #include <Types/MatrixTranslator.hpp>
-#include "Property.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>

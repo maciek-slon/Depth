@@ -6,10 +6,10 @@
 #ifndef NORMALESTIMATOR_HPP_
 #define NORMALESTIMATOR_HPP_
 
-#include "Component_Aux.hpp"
-#include "Component.hpp"
-#include "DataStream.hpp"
-#include "Property.hpp"
+#include "Base/Component_Aux.hpp"
+#include "Base/Component.hpp"
+#include "Base/DataStream.hpp"
+#include "Base/Property.hpp"
 
 #include <string>
 
@@ -71,7 +71,7 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <NormalEstimator> h_onNewImage;
+//	Base::EventHandler <NormalEstimator> h_onNewImage;
 
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_img;

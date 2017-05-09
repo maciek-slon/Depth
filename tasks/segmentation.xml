@@ -61,6 +61,9 @@
 			<sink>DepthConverter.in_depth</sink>
 			<sink>NormalEstimator.in_depth</sink>
 		</Source>
+		<Source name="Source.out_camera_info">
+			<sink>DepthConverter.in_camera_info</sink>
+		</Source>
 		<Source name="DepthConverter.out_depth">
 			<sink>Segmentation.in_depth</sink>		
 		</Source>

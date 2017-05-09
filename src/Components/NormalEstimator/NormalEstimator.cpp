@@ -28,8 +28,7 @@ NormalEstimator::~NormalEstimator()
 }
 
 void NormalEstimator::prepareInterface() {
-	h_onNewImage.setup(this, &NormalEstimator::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&NormalEstimator::onNewImage, this));
 
 	registerStream("in_cloud", &in_img);
 
@@ -197,8 +196,8 @@ void NormalEstimator::onNewImage() {
 		LOG(LNOTICE) << t1 << ", " << t2-t1;
 		out_img.write(out.clone());
 		out_normals.write(normals);
-	} catch (const exception& ex) {
-		LOG(LERROR) << "NormalEstimator::onNewImage() failed. " << ex.what() << endl;
+	} catch (const std::exception& ex) {
+		LOG(LERROR) << "NormalEstimator::onNewImage() failed. " << ex.what() << std::endl;
 	}
 }
 
